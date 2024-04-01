@@ -36,11 +36,11 @@
 		<!-- Page Features -->
 		<div class="row text-center">
 
-			<div class="col-lg-3 col-md-6 mb-4">
+			<div class="col-lg-3 col-md-6 mb-4" th:each="producto: ${productos}">
 				<div class="card h-100">
-					<img class="card-img-top" src="https://86b3cf9a92.cbaul-cdnwnd.com/885b1148caffdd116133fad6339b85e6/system_preview_detail_200000035-92533944cd/Tortas_6.jpg" widht="500" height="225" alt="">
+					<img class="card-img-top" th:src="@{/images/{img} (img=${producto.imagen})}" width="332" height="193">
 					<div class="card-body">
-						<p class="card-text">Nombre del producto.</p>
+						<p class="card-text" th:text="${producto.nombre}"></p>
 					</div>
 					<div class="card-footer">
 						<a href="productohome.html" class="btn btn-success">Ver
@@ -49,42 +49,7 @@
 				</div>
 			</div>
 
-			<div class="col-lg-3 col-md-6 mb-4">
-				<div class="card h-100">
-					<img class="card-img-top" src="https://www.cocina-chilena.com/base/stock/Recipe/506-image/506-image_web.jpg" widht="500" height="225" alt="">
-					<div class="card-body">
-						<p class="card-text">Nombre del producto.</p>
-					</div>
-					<div class="card-footer">
-						<a href="#" class="btn btn-success">Ver producto</a>
-					</div>
-				</div>
-			</div>
-
-			<div class="col-lg-3 col-md-6 mb-4">
-				<div class="card h-100">
-				<img class="card-img-top" src="https://lh3.googleusercontent.com/proxy/tUCAZ8XDNO9Eo9ozP5W9mWjwEm7b-qQC5vWt3LFv8dJcjg7NniNN4Z0Asyqi_mi46wNX_9nYtOylD8_0B2-w7Kl2kzb-5SMjmcW942VdOOhJt8qzVEKGImxqIbvwEQFOdiPt_aVRUTi-3CCplPz1jiRAd1JNyyA4A9AymPPdX8vhjRPPO1QSBnmOzWJBvCCPc4CLmF0qWJtHlnU-f1r3cH8BHbG4dBsYZEOE" widht="500" height="225" alt="">
-
-					<div class="card-body">
-						<p class="card-text">Nombre del producto.</p>
-					</div>
-					<div class="card-footer">
-						<a href="#" class="btn btn-success">Ver producto</a>
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-3 col-md-6 mb-4">
-				<div class="card h-100">
-					<img class="card-img-top" src="https://www.tipicochileno.cl/wp-content/uploads/2021/05/pastel-de-choclo2-1200-628.jpg" widht="500" height="225" alt="">
-					<div class="card-body">
-						<p class="card-text">Nombre del producto.</p>
-					</div>
-					<div class="card-footer">
-						<a href="#" class="btn btn-success">Ver producto</a>
-					</div>
-				</div>
-			</div>
-
+		
 		</div>
 		<!-- /.row -->
 
@@ -92,11 +57,13 @@
 	<!-- /.container -->
 
 	<!-- Footer -->
-	<div th:include="administrador/template_admin.html::footer"></div>
 
-	<!-- Bootstrap core JavaScript -->
-	<script src="vendor/jquery/jquery.min.js"></script>
-	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<div th:include="administrador/template_admin.html::footer"></div>
+
+
+<!-- Bootstrap core JavaScript -->
+<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
 </body>
 
