@@ -58,16 +58,20 @@ public class ProductoController {
 		producto=optionalProducto.get();
 		LOGGER.info("producto buscado: {}", producto);
 		model.addAttribute("producto", producto);
-		return "productos/edit";
-		
+		return "productos/edit";		
 		
 	}
 	
 	@PostMapping("/update")
-	public String update(Producto producto) {
+	public String update(Producto producto) {		
+		productoService.update(producto);		
+		return "redirect:/productos";
+	}
+	
+	@GetMapping("/delete/{id}")
+	public String delete(@PathVariable Integer id) {
 		
-		productoService.update(producto);
-		
+		productoService.delete(id);		
 		return "redirect:/productos";
 	}
 
