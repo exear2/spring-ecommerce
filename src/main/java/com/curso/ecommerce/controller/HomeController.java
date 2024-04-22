@@ -1,8 +1,10 @@
 package com.curso.ecommerce.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +18,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.curso.ecommerce.model.Producto;
+import com.curso.ecommerce.model.Usuario;
+import com.curso.ecommerce.service.IDetalleOrdenService;
+import com.curso.ecommerce.service.IOrdenService;
+import com.curso.ecommerce.service.IUsuarioService;
 import com.curso.ecommerce.service.ProductoService;
+
+import jakarta.servlet.http.HttpSession;
+
 import com.curso.ecommerce.model.DetalleOrden;
 import com.curso.ecommerce.model.Orden;
 
@@ -28,6 +37,16 @@ public class HomeController {
 
 	@Autowired
 	private ProductoService productoService;
+	
+	@Autowired
+	private IUsuarioService UsuarioService;
+	
+	
+	@Autowired
+	private IOrdenService ordenService;
+	
+	@Autowired
+	private IDetalleOrdenService detalleOrdenService;
 
 	// para almacenar los detalles de la orden
 	List<DetalleOrden> detalles = new ArrayList<DetalleOrden>();
@@ -61,7 +80,6 @@ public class HomeController {
 		Producto producto = new Producto();
 		double sumaTotal = 0;
 		double cantProd = 0;
-		
 
 		Optional<Producto> optionalProducto = productoService.get(id);
 		log.info("Producto añadido: {}", optionalProducto.get());
@@ -77,6 +95,7 @@ public class HomeController {
 		Integer idProducto = producto.getId();
 		boolean ingresado = detalles.stream().anyMatch(p -> p.getProducto().getId() == idProducto);
 		log.info("Producto añadido: {}", ingresado);
+
 		
 		/*
 		 * if (!ingresado) {
@@ -85,10 +104,10 @@ public class HomeController {
 		 * 
 		 * }
 		 */
-		
+
 		detalles.add(detalleOrden);
 		sumaTotal = detalles.stream().mapToDouble(dt -> dt.getTotal()).sum();
-		cantProd = detalles.stream().mapToDouble(dt -> dt.getCantidad()).count();
+		cantProd  = detalles.stream().mapToDouble(dt -> dt.getCantidad()).count();
 
 		orden.setTotal(sumaTotal);
 		model.addAttribute("cart", detalles);
@@ -96,6 +115,17 @@ public class HomeController {
 
 		return "usuario/carrito";
 
+	}
+
+	@GetMapping("/getCart")
+	public String getCart(Model model, HttpSession session) {
+
+		model.addAttribute("cart", detalles);
+		model.addAttribute("orden", orden);
+
+		// sesion
+		model.addAttribute("sesion", session.getAttribute("idusuario"));
+		return "/usuario/carrito";
 	}
 
 	// quitar un producto del carrito
@@ -123,5 +153,54 @@ public class HomeController {
 
 		return "usuario/carrito";
 	}
+	
+	@GetMapping("/order")
+	public String order(Model model) {
+		
+		//Usuario usuario =UsuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();
+		
+		Usuario usuario = UsuarioService.findById(1).get();
+		model.addAttribute("cart", detalles);
+		model.addAttribute("orden", orden);
+		model.addAttribute("usuario", usuario);
+		
+		return "usuario/resumenorden";
+	}
+	
+	// guardar la orden
+		@GetMapping("/saveOrder")
+		public String saveOrder(HttpSession session ) {
+			Date fechaCreacion = new Date();
+			orden.setFechaCreacion(fechaCreacion);
+			orden.setNumero(ordenService.generarNumeroOrden());
+			
+			//usuario
+			Usuario usuario = UsuarioService.findById(1).get();
+			
+			orden.setUsuario(usuario);
+			ordenService.save(orden);
+			
+			//guardar detalles
+			for (DetalleOrden dt:detalles) {
+				dt.setOrden(orden);
+				detalleOrdenService.save(dt);
+			}
+			
+			///limpiar lista y orden
+			orden = new Orden();
+			detalles.clear();
+			
+			return "redirect:/";
+		}
+		
+		@PostMapping("/search")
+		public String searchProduct(@RequestParam String nombre, Model model) {
+			log.info("Nombre del producto: {}", nombre);
+			List<Producto> productos= productoService.findAll().stream().filter( p -> p.getNombre().contains(nombre)).collect(Collectors.toList());
+			model.addAttribute("productos", productos);		
+			return "usuario/home";
+		}
+	
+	
 
 }
